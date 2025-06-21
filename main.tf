@@ -150,6 +150,7 @@ resource "aws_key_pair" "mm_bookstore_keypair" {
   }
 }
 
+# ✅ Create an EC2 Instance
 resource "aws_instance" "mm-book-store" {
 
   # Change to t2.micro for free tier eligibility
@@ -170,6 +171,15 @@ resource "aws_instance" "mm-book-store" {
   # Use the security group created earlier
   vpc_security_group_ids = [aws_security_group.mm_bookstore_secgp.id]
 
+  # Run a simple script to install Docker
+  user_data = <<-EOF
+                #!/bin/bash
+                sudo apt-get update -y
+                sudo apt-get install -y docker.io docker-compose
+                systemctl start docker
+                systemctl enable docker
+                usermod -aG docker ubuntu
+                EOF
   tags = {
     Name = "MM Book Store"
   }
